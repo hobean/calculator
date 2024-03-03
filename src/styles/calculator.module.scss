@@ -1,23 +1,36 @@
 .container {
+    background-color: #cdd0bc;
     width: 500px;
     height: 700px;
-    background-color: #cdd0bc;
 
     div {
         width: 100%;
         height: 100%;
 
-        input {
+        .preview {
+            width: 100%;
+            background-color: white;
+            height: 6%;
+            font-size: 20px;
+            text-align: right;
+            vertical-align: bottom;
+        }
+
+
+
+        .res {
             background-color: white;
             border-style: hidden;
             width: 100%;
-            height: 36%;
+            height: 30%;
             font-size: 50px;
             font-weight: bolder;
             text-align: right;
+            outline: none;
+            vertical-align: top;
         }
 
-        div {
+        .btn {
             width: 100%;
             background-color: rgb(243, 243, 243);
             height: 64%;
@@ -47,8 +60,5 @@
                 font-size: 23px;
             }
         }
-
-
     }
-
 }
