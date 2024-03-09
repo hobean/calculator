@@ -45,6 +45,68 @@ const Calculator = () => {
         key={idx}
         className={sign === "=" ? styles.blu : styles.grey}
         onClick={() => {
+          // if (sign === "X") {
+          //     addCal.current = false;
+          //     preNum.current = "";
+          //     nextNum.current = "";
+          //     operator.current = "";
+          //     setRes("0");
+          //     setTmp("");
+          //   } else if (operator.current) {
+          //     // 기존 연산자 존재
+          //     console.log("++ operator ++");
+          //     if (sign === "=") {
+          //       // '=' 입력
+          //       console.log("=");
+          //       setTmp(tmp + sign);
+          //       if (tmp[tmp.length - 1] === "=") {
+          //         // ex) ==
+          //         console.log("aa");
+          //         setTmp(
+          //           preNum.current + operator.current + nextNum.current + "="
+          //         );
+          //         preNum.current = String(
+          //           Number(preNum.current) + Number(nextNum.current)
+          //         );
+          //         setRes(preNum.current);
+          //       } else if (tmp[tmp.length - 1] === operator.current) {
+          //         // ex) ++ --
+          //         nextNum.current = preNum.current;
+          //         setTmp(
+          //           preNum.current + operator.current + nextNum.current + "="
+          //         );
+          //         preNum.current = String(
+          //           Number(preNum.current) + Number(nextNum.current)
+          //         );
+          //         setRes(preNum.current);
+          //       } else if (operator.current === "+") {
+          //         console.log("---");
+          //         preNum.current = String(
+          //           Number(preNum.current) + Number(nextNum.current)
+          //         );
+          //         setRes(preNum.current);
+          //       } else if (operator.current === "-") {
+          //         setRes(
+          //           String(Number(preNum.current) - Number(nextNum.current))
+          //         );
+          //         preNum.current = String(
+          //           Number(preNum.current) - Number(nextNum.current)
+          //         );
+          //       } else if (operator.current === "*") {
+          //         setRes(
+          //           String(Number(preNum.current) * Number(nextNum.current))
+          //         );
+          //         preNum.current = String(
+          //           Number(preNum.current) * Number(nextNum.current)
+          //         );
+          //       } else if (operator.current === "/") {
+          //         setRes(
+          //           String(Number(preNum.current) / Number(nextNum.current))
+          //         );
+          //         preNum.current = String(
+          //           Number(preNum.current) / Number(nextNum.current)
+          //         );
+          //       }
           if (operator.current) {
             // 기존 연산자 존재
             console.log("++ operator ++");
