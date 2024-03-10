@@ -7,6 +7,28 @@ export type Operator = "+" | "-" | "*" | "/";
  * @returns
  */
 
+export const isOperator = (sign: string): boolean => {
+  if (sign === "+" || sign === "-" || sign === "*" || sign === "/") return true;
+  else return false;
+};
+
+export const isNum = (sign: string): boolean => {
+  switch (sign) {
+    case "1":
+    case "2":
+    case "3":
+    case "4":
+    case "5":
+    case "6":
+    case "7":
+    case "8":
+    case "9":
+      return true;
+    default:
+      return false;
+  }
+};
+
 export const operate = (a: number, b: number, operator: Operator): number => {
   switch (operator) {
     case "+":
