@@ -162,7 +162,9 @@ const Calculator = () => {
               } else {
                 // # N O N
                 console.log("++ nextNum 계산 ++");
-                nextNum.current = nextNum.current + sign;
+                console.log(nextNum.current);
+                if (nextNum.current[0] === "0") nextNum.current = sign;
+                else nextNum.current = nextNum.current + sign;
                 setRes(nextNum.current);
               }
             }

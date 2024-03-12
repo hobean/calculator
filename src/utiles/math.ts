@@ -1,19 +1,23 @@
 export type Operator = "+" | "-" | "*" | "/";
-/** JS Dock
- *
- * @param a
- * @param b
- * @param operation 연산자 ('+', '-', '*', '/')
- * @returns
- */
 
+/**
+ * @param sign
+ * @returns boolean
+ */
 export const isOperator = (sign: string): boolean => {
   if (sign === "+" || sign === "-" || sign === "*" || sign === "/") return true;
   else return false;
 };
 
+/**
+ * @param sign
+ * @returns boolean
+ */
 export const isNum = (sign: string): boolean => {
   switch (sign) {
+    case "0":
+      if (sign[0] === "0") return false;
+      else return true;
     case "1":
     case "2":
     case "3":
@@ -29,6 +33,11 @@ export const isNum = (sign: string): boolean => {
   }
 };
 
+/**
+ * @param a
+ * @param b
+ * @param operator 연산자 ('+', '-', '*', '/')
+ */
 export const operate = (a: number, b: number, operator: Operator): number => {
   switch (operator) {
     case "+":
