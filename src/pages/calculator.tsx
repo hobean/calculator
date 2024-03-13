@@ -43,6 +43,7 @@ const Calculator = () => {
   const operator = useRef<Operator | null>(null); // 기존 연산자 유무
   const addCal = useRef(false); // 추가 계산 유무
   const preSign = useRef("");
+  const lastOperator = useRef("");
   const signs = sign.map((sign, idx) => {
     // $$$ map 함수 파라미터
     return (
@@ -52,7 +53,9 @@ const Calculator = () => {
         onClick={() => {
           preSign.current += sign; // ??? 대체
           const lastSign = preSign.current[preSign.current.length - 2];
-          if (sign === "C") {
+          if (sign === ".") {
+            setRes("\frac{1}{x}");
+          } else if (sign === "C") {
             // ??? if문 조건
             preNum.current = "";
             nextNum.current = "";
@@ -65,8 +68,10 @@ const Calculator = () => {
             // # 첫 입력이 =일 떄
             sign === "=" &&
             preNum.current === "" &&
-            nextNum.current === ""
+            nextNum.current === "" &&
+            lastSign == ""
           ) {
+            console.log("첫 입력이 =일 때");
             setTmp("0=");
           } else if (sign === "CE") {
             console.log("CE");
@@ -99,17 +104,16 @@ const Calculator = () => {
               // # = XX
               console.log("= XX");
             } else if (
-              // # O XX
               lastSign === "X" &&
               operator.current &&
               !nextNum.current
             ) {
+              // # O XX
               console.log("O XX");
             } else if (lastSign === "X" && operator.current && addCal.current) {
+              // # 추가연산 XX
               console.log("OO XX");
-            }
-            // # OO XX
-            else if (isOperator(lastSign)) {
+            } else if (isOperator(lastSign)) {
               // # O X
               console.log("O X");
             } else {
@@ -128,15 +132,13 @@ const Calculator = () => {
           } else if (operator.current) {
             // 기존 연산자 존재 # N O
             console.log("N O");
-            console.log("preNum : " + preNum.current);
-            console.log("nextNum : " + nextNum.current);
-            console.log("operator : " + operator.current);
             if (sign === "=") {
-              // N O =
-              if (preNum.current === "" && nextNum.current === "") {
+              if (operator.current === "/" && nextNum.current === "0") {
+                setRes("0으로 나눌 수 없습니다.");
+              } else if (preNum.current === "" && nextNum.current === "") {
                 console.log("aaaa");
               } else if (tmp[tmp.length - 1] === "=") {
-                // N O = =
+                // # N O = =
                 console.log("==");
                 const result = operate(
                   Number(preNum.current),
@@ -156,18 +158,58 @@ const Calculator = () => {
               } else {
                 console.log("= = 아닐 때");
                 if (isOperator(tmp[tmp.length - 1])) {
-                  // N O =
-                  console.log("N O");
-                  nextNum.current = res;
-                  setTmp(tmp + nextNum.current + sign);
-                  const result = operate(
-                    Number(preNum.current),
-                    Number(nextNum.current),
-                    operator.current
-                  );
-                  setRes(String(result));
+                  // # N O =
+                  console.log("N O =");
+                  if (addCal.current) {
+                    console.log(preNum.current);
+                    console.log(nextNum.current);
+                    if (isOperator(lastSign)) {
+                      // # N O N O O =
+                      console.log("N O N O O =");
+                      preNum.current = String(
+                        operate(
+                          Number(preNum.current),
+                          Number(nextNum.current),
+                          lastOperator.current as Operator
+                        )
+                      );
+                      nextNum.current = preNum.current;
+                      setTmp(
+                        preNum.current +
+                          operator.current +
+                          nextNum.current +
+                          sign
+                      );
+                      const result = operate(
+                        Number(preNum.current),
+                        Number(nextNum.current),
+                        operator.current
+                      );
+                      setRes(String(result));
+                    } else {
+                      // # N O N O X X =
+                      console.log("추가연산 XX = ");
+                    }
+                    addCal.current = false;
+                  } else {
+                    nextNum.current = res;
+                    setTmp(tmp + nextNum.current + sign);
+                    const result = operate(
+                      Number(preNum.current),
+                      Number(nextNum.current),
+                      operator.current
+                    );
+                    setRes(String(result));
+                  }
                 } else {
-                  console.log(" N O !=");
+                  console.log(" N O X=");
+                  preNum.current = String(
+                    operate(
+                      Number(preNum.current),
+                      Number(nextNum.current),
+                      operator.current
+                    )
+                  );
                   const result = operate(
                     Number(preNum.current),
                     Number(nextNum.current),
@@ -199,6 +241,8 @@ const Calculator = () => {
                 setTmp(String(result) + sign);
                 setRes(String(result));
                 operator.current = sign as Operator;
+                lastOperator.current = operator.current;
+                console.log("operator : " + operator.current);
                 addCal.current = true;
               }
             } else if (lastSign === "=") {
