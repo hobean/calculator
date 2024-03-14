@@ -1,11 +1,11 @@
-export type Operator = "+" | "-" | "*" | "/";
+export type Operator = "+" | "-" | "*" | "÷";
 
 /**
  * @param sign
  * @returns boolean
  */
 export const isOperator = (sign: string): boolean => {
-  if (sign === "+" || sign === "-" || sign === "*" || sign === "/") return true;
+  if (sign === "+" || sign === "-" || sign === "*" || sign === "÷") return true;
   else return false;
 };
 
@@ -44,7 +44,7 @@ export const operate = (a: number, b: number, operator: Operator): number => {
       return a - b;
     case "*":
       return a * b;
-    case "/":
+    case "÷":
       return a / b;
     default:
       throw new Error(`지원하지 않는 연산자: + ${operator}`);

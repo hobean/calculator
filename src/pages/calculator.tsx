@@ -8,9 +8,11 @@ import { useRef, useState } from "react";
 // 추가연산 XX 수정
 // 0 = 수정
 // 0 + = 수정
-// 1/x 구현
+// ⅟x 구현
 // reset 함수
 // >> num에 0 포함
+// ??? operator.current = lastSign;
+// ⅟x X 수정
 
 const sign = [
   "%",
@@ -20,7 +22,7 @@ const sign = [
   "⅟x",
   "x²",
   "2√x",
-  "/",
+  "÷",
   "7",
   "8",
   "9",
@@ -71,20 +73,71 @@ const Calculator = () => {
           const lastSign = preSign.current[signNum.current - 2];
           if (sign === "%") {
           } else if (sign === "⅟x") {
-            console.log("1 / x");
-            console.log(preNum.current);
-            console.log(nextNum.current);
-            console.log(operator.current);
+            console.log("⅟x");
             if (
+              // # 0으로 나눌 때
               preNum.current === "" &&
               nextNum.current === "" &&
               res === "0"
             ) {
               reset();
               setRes("0으로 나눌 수 없습니다.");
+            } else if (isOperator(lastSign)) {
+              if (addCal.current) {
+                // # N O N O ⅟x
+                console.log("N O N O ⅟x");
+                preNum.current = String(
+                  operate(
+                    Number(preNum.current),
+                    Number(nextNum.current),
+                    lastOperator.current as Operator
+                  )
+                );
+                setTmp(
+                  preNum.current +
+                    operator.current +
+                    "1/(" +
+                    preNum.current +
+                    ")"
+                );
+                nextNum.current = String(
+                  operate(1, Number(preNum.current), "÷")
+                );
+                setRes(nextNum.current);
+                addCal.current = false;
+              } else {
+                // # N O ⅟x
+                console.log("N O ⅟x");
+                nextNum.current = String(
+                  operate(1, Number(preNum.current), "÷")
+                );
+                setTmp(
+                  preNum.current +
+                    operator.current +
+                    "1/(" +
+                    preNum.current +
+                    ")"
+                );
+                setRes(nextNum.current);
+              }
+            } else if (isNum(lastSign) && operator.current) {
+              // # N O N ⅟x
+              console.log("N O N ⅟x");
+              setTmp(
+                preNum.current +
+                  operator.current +
+                  "1/(" +
+                  nextNum.current +
+                  ")"
+              );
+              nextNum.current = String(
+                operate(1, Number(nextNum.current), "÷")
+              );
+              setRes(nextNum.current);
             } else {
-              console.log("11");
-              const result = operate(1, Number(preNum.current), "/");
+              // N N ⅟x
+              console.log("N N ⅟x");
+              const result = operate(1, Number(preNum.current), "÷");
               setTmp("1/(" + preNum.current + ")");
               setRes(String(result));
             }
@@ -113,7 +166,10 @@ const Calculator = () => {
               setRes("0");
             }
           } else if (sign === "X") {
-            if (!nextNum.current && !operator.current) {
+            if (lastSign === "⅟x" || tmp[tmp.length - 1] === ")") {
+              // ⅟x X
+              console.log("⅟x X");
+            } else if (!nextNum.current && !operator.current) {
               // preNum 지우기
               console.log("preNum 지우기");
               preNum.current = preNum.current.slice(
@@ -164,7 +220,7 @@ const Calculator = () => {
             if (sign === "=") {
               if (
                 // # 0 / =, 0 / 0 =
-                operator.current === "/" &&
+                operator.current === "÷" &&
                 (nextNum.current === "0" || tmp === "0/")
               ) {
                 reset();
@@ -257,8 +313,20 @@ const Calculator = () => {
                     );
                     setRes(String(result));
                   }
+                } else if (lastSign === "⅟x") {
+                  // # N O ⅟x =
+                  const result = operate(
+                    Number(preNum.current),
+                    Number(nextNum.current),
+                    operator.current
+                  );
+                  setTmp(tmp + "=");
+                  setRes(String(result));
                 } else {
                   console.log(" N O X=");
+                  console.log(preNum.current);
+                  console.log(nextNum.current);
+                  console.log(operator.current);
                   preNum.current = String(
                     operate(
                       Number(preNum.current),
@@ -296,9 +364,10 @@ const Calculator = () => {
                 );
                 setTmp(String(result) + sign);
                 setRes(String(result));
-                operator.current = sign as Operator;
                 lastOperator.current = operator.current;
+                operator.current = sign as Operator;
                 console.log("operator : " + operator.current);
+                console.log("lastOperator : " + lastOperator.current);
                 addCal.current = true;
               }
             } else if (lastSign === "=") {
