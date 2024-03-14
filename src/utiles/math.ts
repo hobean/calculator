@@ -16,8 +16,6 @@ export const isOperator = (sign: string): boolean => {
 export const isNum = (sign: string): boolean => {
   switch (sign) {
     case "0":
-      if (sign[0] === "0") return false;
-      else return true;
     case "1":
     case "2":
     case "3":
