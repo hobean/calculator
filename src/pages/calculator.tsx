@@ -4,15 +4,9 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
-// preSign string -> string[] 수정
-// 추가연산 XX 수정
-// 0 = 수정
-// 0 + = 수정
-// ⅟x 구현
-// reset 함수
-// >> num에 0 포함
-// ??? operator.current = lastSign;
-// ⅟x X 수정
+// 더닝 크루거 효과
+// N 1/x 1/x 고치기
+// lastSign === "1/x, x²" 찾아서 고치기..
 
 const sign = [
   "%",
@@ -52,6 +46,12 @@ const Calculator = () => {
   const preSign = useRef<string[]>([""]);
   const signNum = useRef(0);
   const signs = sign.map((sign, idx) => {
+    const printLog = (): void => {
+      console.log(preNum.current);
+      console.log(nextNum.current);
+      console.log(operator.current);
+    };
+
     const reset = (): void => {
       preNum.current = "";
       nextNum.current = "";
@@ -74,14 +74,21 @@ const Calculator = () => {
           if (sign === "%") {
           } else if (sign === "⅟x") {
             console.log("⅟x");
-            if (
-              // # 0으로 나눌 때
-              preNum.current === "" &&
-              nextNum.current === "" &&
-              res === "0"
-            ) {
-              reset();
-              setRes("0으로 나눌 수 없습니다.");
+            if (res === "0") {
+              // # (0) ⅟x
+              if (!operator.current) {
+                // # (0) N ⅟x
+                console.log("(0) N ⅟x");
+                setTmp("1/(0)");
+                setRes("0으로 나눌 수 없습니다.");
+              } else {
+                // # (0) ⅟x
+                console.log("0+1/(0)=");
+                setTmp("0+1/(0)=");
+                setRes("0으로 나눌 수 없습니다.");
+              }
+            } else if (lastSign === "⅟x") {
+              // # ⅟x ⅟x
             } else if (isOperator(lastSign)) {
               if (addCal.current) {
                 // # N O N O ⅟x
@@ -137,12 +144,87 @@ const Calculator = () => {
             } else {
               // N N ⅟x
               console.log("N N ⅟x");
-              const result = operate(1, Number(preNum.current), "÷");
               setTmp("1/(" + preNum.current + ")");
-              setRes(String(result));
+              const result = operate(1, Number(preNum.current), "÷");
+              preNum.current = String(result);
+              setRes(preNum.current);
             }
           } else if (sign === "x²") {
-            setRes("x²");
+            // # N  x²
+            // # N  x² N ---
+            // # x² x²
+            // # N  x² x²
+            // # N  O  x²
+            // # N  O  N  x²
+            // # N  O  x² x²
+            // # N  O  x² N  ----
+            // # N  O  x² x² N
+            // # N  O  x² x² x²
+            console.log(preNum.current);
+            console.log(nextNum.current);
+            console.log(operator.current);
+            if (
+              // # 0으로 나눌 때
+              preNum.current === "" &&
+              nextNum.current === "" &&
+              res === "0"
+            ) {
+              console.log("0으로 나눌 때");
+              preNum.current = "0";
+              const result = "sqr(0)";
+              setTmp(result);
+              setRes("0");
+            } else if (isOperator(lastSign)) {
+              // # N O x²
+              console.log("isOper");
+              setTmp(
+                preNum.current +
+                  operator.current +
+                  "sqr(" +
+                  preNum.current +
+                  ")"
+              );
+              nextNum.current = String(Number(preNum.current) ** 2);
+              setRes(nextNum.current);
+            } else if (lastSign === "x²" && operator.current) {
+              // if (!nextNum.current) {
+              // # N O x² x²
+              // # N O x² x² N
+              console.log("N O x² x²");
+              console.log(tmp);
+              const resultTmp = "sqr(" + preNum.current + ")";
+              setTmp(
+                preNum.current + operator.current + "sqr(" + resultTmp + ")"
+              );
+              // } else {
+              // # N O x² x² x²
+              //   console.log("N O x² x² x²");
+              // }
+            } else if (isNum(lastSign) && operator.current) {
+              // # N O N x²
+              console.log("isNum");
+              setTmp(
+                preNum.current +
+                  operator.current +
+                  "sqr(" +
+                  nextNum.current +
+                  ")"
+              );
+              nextNum.current = String(Number(nextNum.current) ** 2);
+              setRes(nextNum.current);
+            } else if (lastSign === "x²" && !operator.current) {
+              // # x² x², N x² x²
+              console.log("N x² x²");
+              setTmp("sqr(" + tmp + ")");
+              preNum.current = String(Number(preNum.current) ** 2);
+              setRes(preNum.current);
+            } else {
+              // # N x²
+              console.log("x² else");
+              setTmp("sqr(" + preNum.current + ")");
+              preNum.current = String(Number(preNum.current) ** 2);
+              setRes(preNum.current);
+            }
           } else if (
             // # 첫 입력이 =일 떄
             sign === "=" &&
@@ -313,8 +395,19 @@ const Calculator = () => {
                     );
                     setRes(String(result));
                   }
+                } else if (lastSign === "x²") {
+                  // # N O x² =
+                  console.log("N O x²");
+                  const result = operate(
+                    Number(preNum.current),
+                    Number(nextNum.current),
+                    operator.current
+                  );
+                  setTmp(tmp + "=");
+                  setRes(String(result));
                 } else if (lastSign === "⅟x") {
-                  // # N O ⅟x =
+                  // # N O ⅟x =, N O N ⅟x =
+                  console.log("N O (N) ⅟x =");
                   const result = operate(
                     Number(preNum.current),
                     Number(nextNum.current),
@@ -349,6 +442,7 @@ const Calculator = () => {
               // sign === 연산자
               if (operator.current !== sign && tmp.slice(0, -1) === res) {
                 // 기존 연산자와 입력된 연산자가 다를 때
+                console.log("기존 연산자와 입력된 연산자가 다를 때");
                 operator.current = sign as Operator;
                 setTmp(res + operator.current);
               } else if (sign === lastSign) {
@@ -370,14 +464,7 @@ const Calculator = () => {
                 console.log("lastOperator : " + lastOperator.current);
                 addCal.current = true;
               }
-            } else if (lastSign === "=") {
-              // # = N
-              preNum.current = sign;
-              nextNum.current = "";
-              operator.current = null;
-              setTmp("");
-              setRes(preNum.current);
-            } else {
+            } else if (isNum(sign)) {
               // nextNum
               if (addCal.current) {
                 // # N O N O N
@@ -387,6 +474,27 @@ const Calculator = () => {
                 setTmp(preNum.current + operator.current);
                 setRes(nextNum.current);
                 addCal.current = false;
+              } else if (lastSign === "=") {
+                // # = N
+                preNum.current = sign;
+                nextNum.current = "";
+                operator.current = null;
+                setTmp("");
+                setRes(preNum.current);
+              } else if (lastSign === "⅟x" || lastSign === "x²") {
+                // # N O N ⅟x N
+                // # N O N x² N
+                console.log("N O N ⅟x N");
+                nextNum.current = sign;
+                setTmp(preNum.current + operator.current);
+                setRes(nextNum.current);
+                // } else if (lastSign === "x²") {
+                //   // # N O N x² N
+                //   console.log("N O N x² N");
+                //   printLog();
+                //   nextNum.current = sign;
+                //   setTmp(preNum.current + operator.current);
+                //   setRes(nextNum.current);
               } else {
                 // # N O N
                 console.log("++ nextNum 계산 ++");
@@ -405,24 +513,38 @@ const Calculator = () => {
                   setRes(nextNum.current);
                 }
               }
+            } else {
+              console.log("else");
             }
           } else if (isOperator(sign)) {
             // ??? sign === Operator
             // 연산자 입력
-            console.log(operator.current);
+            console.log("Operator");
             if (!preNum.current) {
               setTmp("0" + sign);
               operator.current = sign as Operator;
               preNum.current = "0";
+            } else if (lastSign === "⅟x") {
+              console.log("⅟x");
+            } else if (lastSign === "x²") {
+              console.log("x²");
             } else {
               setTmp(preNum.current + sign);
-              operator.current = sign as Operator; // ??? sign 왜 안 되는지
+              operator.current = sign as Operator;
             }
           } else if (isNum(sign)) {
             // 첫번째 계산, preNum 구하기 # N # O
             console.log("++ preNum 계산 ++");
+            console.log(preNum.current);
             if (preNum.current[0] === "0") preNum.current = sign;
-            else preNum.current = preNum.current + sign;
+            else if (lastSign === "⅟x") {
+              console.log("⅟x N");
+              preNum.current = sign;
+              setRes(preNum.current);
+            } else if (lastSign === "x²") {
+              preNum.current = sign;
+              setRes(preNum.current);
+            } else preNum.current = preNum.current + sign;
             setRes(preNum.current);
           } else if (!nextNum.current) {
             // N =
@@ -432,6 +554,7 @@ const Calculator = () => {
             console.log(sign);
             console.log(preNum.current);
             console.log(nextNum.current);
+            console.log(operator.current);
             console.log(lastSign);
           }
         }}
