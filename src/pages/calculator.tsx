@@ -4,9 +4,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
-// 더닝 크루거 효과
-// N 1/x 1/x 고치기
-// lastSign === "1/x, x²" 찾아서 고치기..
+// 연산자 추가하기
 
 const sign = [
   "%",

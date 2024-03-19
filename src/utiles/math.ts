@@ -34,7 +34,7 @@ export const isNum = (sign: string): boolean => {
 /**
  * @param a
  * @param b
- * @param operator 연산자 ('+', '-', '*', '/', '⅟x', 'x²')
+ * @param operator 연산자 ('+', '-', '*', '/')
  */
 export const operate = (a: number, b: number, operator: Operator): number => {
   switch (operator) {
@@ -46,10 +46,6 @@ export const operate = (a: number, b: number, operator: Operator): number => {
       return a * b;
     case "÷":
       return a / b;
-    case "⅟x":
-      return 1 / a;
-    case "x²":
-      return a;
     default:
       throw new Error(`지원하지 않는 연산자: + ${operator}`);
   }
