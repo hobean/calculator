@@ -4,8 +4,6 @@ import Head from "next/head";
 import Link from "next/link";
 import { useRef, useState } from "react";
 
-// 연산자 추가하기
-
 const sign = [
   "%",
   "CE",
